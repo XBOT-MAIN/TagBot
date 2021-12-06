@@ -31,7 +31,7 @@ async def start(event):
                          Button.url('قناة الدعم 💕🍂', 'https://t.me/K_p_s_6'), 
                       ], 
                       [
-                        Button.url('اضفني الي مجموعتك 🙊💕', 'https://t.me/TAAG_X2BOT?startgroup=true'),   
+                        Button.url('ضفني الي مجموعتك 🙊💕', 'https://t.me/TAAG_X2BOT?startgroup=true'),   
                       ]
                    ), 
                     link_preview=False
@@ -40,7 +40,7 @@ async def start(event):
 #help
 @xavierbot.on(events.NewMessage(pattern="^/help$"))
 async def help(event):
-  helptext = "**قائمه مساعده بوت التاك**\n\nالأمر: /all \n يمكنك استخدام هذا الأمر مع النص الذي تريد إخبار الآخرين به. \n مثال: `/all هيي ` \n يمكنك استخدام هذا الأمر كإجابة. أي رسالة سيقوم البوت بوضع علامة على المستخدمين للرسالة التي تم الرد عليها"
+  helptext = "**قائمه مساعده بوت التاك**\n\nالأمر: /all \n يمكنك استخدام هذا الأمر مع النص الذي تريد إخبار الآخرين به. \n مثال: `/all هيي ` \n يمكنك استخدام هذا الأمر كإجابة. أي رسالة سيقوم البوت بوضع علامة على المستخدمين للرسالة التي تم الرد عليه"
   await event.reply(helptext,
                     buttons=(
                       [
@@ -48,7 +48,7 @@ async def help(event):
                          Button.url('قناة الدعم 💕🍂', 'https://t.me/K_p_s_6'), 
                       ], 
                       [
-                        Button.url('اضفني الي مجموعتك 🙊💕', 'https://t.me/TAAG_X2BOT?startgroup=true'),   
+                        Button.url('ضفني الي مجموعتك 🙊💕', 'https://t.me/TAAG_X2BOT?startgroup=true'),   
                       ]
                    ), 
                     link_preview=False
@@ -66,7 +66,7 @@ async def mentionall(event):
     return await event.respond("استخدم الامر في مجموعه او قناه 💕🍂")
   
   admins = []
-  async for admin in client.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins):
+  async for admin in xavierbot.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins):
     admins.append(admin.id)
   if not event.sender_id in admins:
     return await event.respond("يمكن للادمن فقط استخدام بوت التاك 🤓💕")
@@ -78,7 +78,7 @@ async def mentionall(event):
     mode = "text_on_reply"
     msg = event.reply_to_msg_id
     if msg == None:
-        return await event.respond("لا يمكنني ذكر الأعضاء في المنشور القديم !")
+        return await event.respond("لا يمكنني ذكر الأعضاء في المنشور القديم !!")
   elif event.pattern_match.group(1) and event.reply_to_msg_id:
     return await event.respond("أعطني شيئاً. مثال: `/all هيي`")
   else:
@@ -92,7 +92,7 @@ async def mentionall(event):
       usrnum += 1
       usrtxt += f"[{usr.first_name}](tg://user?id={usr.id}) "
       if event.chat_id not in moment_worker:
-        await event.respond("Stopped!")
+        await event.respond("تم التوقف!")
         return
       if usrnum == 5:
         await xavierbot.send_message(event.chat_id, f"{usrtxt}\n\n{msg}")
