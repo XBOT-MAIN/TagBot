@@ -102,8 +102,7 @@ async def mentionall(event):
         
   
   if mode == "text_on_reply":
-    moment_worker.append(event.chat_id)
- 
+    moment_worker.append(event.chat_id) 
     usrnum = 0
     usrtxt = ""
     async for usr in xavierbot.iter_participants(event.chat_id):
@@ -122,12 +121,12 @@ async def mentionall(event):
 # Cancle 
 
 @xavierbot.on(events.NewMessage(pattern="^/cancel$"))
-async def cancel_spam(event):
-  if not event.chat_id in spam_chats:
+async def cancel_mentionall(event):
+  if not event.chat_id in mentionall_chats:
     return await event.respond('__لا يوجد عمليه تاك الان 🤓💕.__')
   else:
     try:
-      spam_chats.remove(event.chat_id)
+      mentionall_chats.remove(event.chat_id)
     except:
       pass
     return await event.respond('**__تم ايقاف التاك 🤓💕__**\n\n**__Powered By:__ @K_P_S_6**')
