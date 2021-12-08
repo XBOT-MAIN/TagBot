@@ -31,7 +31,7 @@ async def start(event):
                          Button.url('قناة الدعم 💕🍂', 'https://t.me/K_p_s_6'), 
                       ], 
                       [
-                        Button.url('ضفني الي مجموعتك 🙊💕', 'https://t.me/TAAG_X2BOT?startgroup=true'),   
+                        Button.url('ضفني الي مجموعتك 🙊💕', 'https://t.me/Q_X2BOT?startgroup=true'),   
                       ]
                    ), 
                     link_preview=False
@@ -121,7 +121,7 @@ async def mentionall(event):
 
 # Cancle 
 
-@xavierbot.on(events.NewMessage(pattern="^/cancel$"))
+@xavierbot.on(events.NewMessage(pattern="^/cancel$|الغاء|/cancel|ايقاف"))
 async def cancel_mentionall(event):
   if not event.chat_id in moment_worker:
     return await event.respond('__لا يوجد عمليه تاك الان 🤓💕.__')
