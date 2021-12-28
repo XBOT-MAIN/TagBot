@@ -1,10 +1,11 @@
 import os, logging, asyncio
+
+from telegraph import upload_file
+
 from telethon import Button
 from telethon import TelegramClient, events
-from telethon.tl.types import ChannelParticipantAdmin
-from telethon.tl.types import ChannelParticipantCreator
-from telethon.tl.functions.channels import GetParticipantRequest
-from telethon.errors import UserNotParticipantError
+from telethon.sessions import StringSession
+from telethon.tl.types import ChannelParticipantsAdmins
 
 logging.basicConfig(
     level=logging.INFO,
@@ -15,109 +16,121 @@ LOGGER = logging.getLogger(__name__)
 api_id = int(os.environ.get("APP_ID"))
 api_hash = os.environ.get("API_HASH")
 bot_token = os.environ.get("TOKEN")
-client = TelegramClient('client', api_id, api_hash).start(bot_token=bot_token)
-spam_chats = []
+xavierbot = TelegramClient('client', api_id, api_hash).start(bot_token=bot_token)
 
-@client.on(events.NewMessage(pattern="^/start$"))
+moment_worker = []
+
+
+#start
+@xavierbot.on(events.NewMessage(pattern="^/start$"))
 async def start(event):
-  await event.reply(
-    "__**I'm MentionAll Bot**, I can mention almost all members in group or channel 👻\nClick **/help** for more information__\n\n Follow [@AnjanaMadu](https://github.com/AnjanaMadu) on Github",
-    link_preview=False,
-    buttons=(
-      [
-        Button.url('📣 Channel', 'https://t.me/harp_tech'),
-        Button.url('📦 Source', 'https://github.com/AnjanaMadu/MentionAllBot')
-      ]
-    )
-  )
+  await event.reply("مـرحبآ بكـ في بوت التاك 😊❤️.!\n استطيع عمل تالك ل 1500 عضو في المجموعات ... وعمل 300 في القنوات .\n قائمه الاوامر /help ",
+                    buttons=(
+                      [
+                         Button.url('𝑫𝒆𝒗', 'https://t.me/W_Q_Z'), 
+                         Button.url('قناة الدعم 💕🍂', 'https://t.me/K_p_s_6'), 
+                      ], 
+                      [
+                        Button.url('ضفني الي مجموعتك 🙊💕', 'https://t.me/Q_X2BOT?startgroup=true'),   
+                      ]
+                   ), 
+                    link_preview=False
+                   )
 
-@client.on(events.NewMessage(pattern="^/help$"))
+#help
+@xavierbot.on(events.NewMessage(pattern="^/help$"))
 async def help(event):
-  helptext = "**Help Menu of MentionAllBot**\n\nCommand: /mentionall\n__You can use this command with text what you want to mention others.__\n`Example: /mentionall Good Morning!`\n__You can you this command as a reply to any message. Bot will tag users to that replied messsage__.\n\nFollow [@AnjanaMadu](https://github.com/AnjanaMadu) on Github"
-  await event.reply(
-    helptext,
-    link_preview=False,
-    buttons=(
-      [
-        Button.url('📣 Channel', 'https://t.me/harp_tech'),
-        Button.url('📦 Source', 'https://github.com/AnjanaMadu/MentionAllBot')
-      ]
-    )
-  )
-  
-@client.on(events.NewMessage(pattern="^/mentionall ?(.*)"))
+  helptext = "**قائمه مساعده بوت التاك**\n\nالأمر: /all \n يمكنك استخدام هذا الأمر مع النص الذي تريد إخبار الآخرين به. \n مثال: `/all هيي ` \n يمكنك استخدام هذا الأمر كإجابة. أي رسالة سيقوم البوت بوضع علامة على المستخدمين للرسالة التي تم الرد عليه"
+  await event.reply(helptext,
+                    buttons=(
+                      [
+                         Button.url('𝑫𝒆𝒗', 'https://t.me/W_Q_Z'), 
+                         Button.url('قناة الدعم 💕🍂', 'https://t.me/K_p_s_6'), 
+                      ], 
+                      [
+                        Button.url('ضفني الي مجموعتك 🙊💕', 'https://t.me/TAAG_X2BOT?startgroup=true'),   
+                      ]
+                   ), 
+                    link_preview=False
+                   )
+
+#التاك
+@xavierbot.on(events.NewMessage(pattern="^/all?(.*)|/all|#tag?(.*)|#tag|@all?(.*)|@all"))
 async def mentionall(event):
-  chat_id = event.chat_id
+  global moment_worker
   if event.is_private:
-    return await event.respond("__This command can be use in groups and channels!__")
+    return await event.respond("**استخدم الامر في مجموعه او قناه 💕🍂**")
   
-  is_admin = False
-  try:
-    partici_ = await client(GetParticipantRequest(
-      event.chat_id,
-      event.sender_id
-    ))
-  except UserNotParticipantError:
-    is_admin = False
-  else:
-    if (
-      isinstance(
-        partici_.participant,
-        (
-          ChannelParticipantAdmin,
-          ChannelParticipantCreator
-        )
-      )
-    ):
-      is_admin = True
-  if not is_admin:
-    return await event.respond("__Only admins can mention all!__")
+  admins = []
+  async for admin in xavierbot.iter_participants(event.chat_id, filter=ChannelParticipantsAdmins):
+    admins.append(admin.id)
+  if not event.sender_id in admins:
+    return await event.respond("**يمكن للادمن فقط استخدام بوت التاك 🤓💕**")
   
-  if event.pattern_match.group(1) and event.is_reply:
-    return await event.respond("__Give me one argument!__")
-  elif event.pattern_match.group(1):
+  if event.pattern_match.group(1):
     mode = "text_on_cmd"
     msg = event.pattern_match.group(1)
-  elif event.is_reply:
+  elif event.reply_to_msg_id:
     mode = "text_on_reply"
-    msg = await event.get_reply_message()
+    msg = event.reply_to_msg_id
     if msg == None:
-        return await event.respond("__I can't mention members for older messages! (messages which are sent before I'm added to group)__")
+        return await event.respond("لا يمكنني ذكر الأعضاء في المنشور القديم !!")
+  elif event.pattern_match.group(1) and event.reply_to_msg_id:
+    return await event.respond("أعطني شيئاً. مثال: `/all هيي`")
   else:
-    return await event.respond("__Reply to a message or give me some text to mention others!__")
+    return await event.respond("قم بالرد علي رساله او اعطني بعض الكلمات لتاك 🤓💕")
+    
+  if mode == "text_on_cmd":
+    moment_worker.append(event.chat_id)
+    usrnum = 0
+    usrtxt = ""
+    async for usr in xavierbot.iter_participants(event.chat_id):
+      usrnum += 1
+      usrtxt += f"[{usr.first_name}](tg://user?id={usr.id}) "
+      if event.chat_id not in moment_worker:
+        await event.respond("تم التوقف!")
+        return
+      if usrnum == 5:
+        await xavierbot.send_message(event.chat_id, f"{usrtxt}\n\n{msg}")
+        await asyncio.sleep(2)
+        usrnum = 0
+        usrtxt = ""
+        
   
-  spam_chats.append(chat_id)
-  usrnum = 0
-  usrtxt = ''
-  async for usr in client.iter_participants(chat_id):
-    if not chat_id in spam_chats:
-      break
-    usrnum += 1
-    usrtxt += f"[{usr.first_name}](tg://user?id={usr.id}) "
-    if usrnum == 5:
-      if mode == "text_on_cmd":
-        txt = f"{usrtxt}\n\n{msg}"
-        await client.send_message(chat_id, txt)
-      elif mode == "text_on_reply":
-        await msg.reply(usrtxt)
-      await asyncio.sleep(2)
-      usrnum = 0
-      usrtxt = ''
-  try:
-    spam_chats.remove(chat_id)
-  except:
-    pass
+  if mode == "text_on_reply":
+    moment_worker.append(event.chat_id)
+ 
+    usrnum = 0
+    usrtxt = ""
+    async for usr in xavierbot.iter_participants(event.chat_id):
+      usrnum += 1
+      usrtxt += f"[{usr.first_name}](tg://user?id={usr.id}) "
+      if event.chat_id not in moment_worker:
+        await event.respond("**تم التوقف**")
+        return
+      if usrnum == 5:
+        await xavierbot.send_message(event.chat_id, usrtxt, reply_to=msg)
+        await asyncio.sleep(2)
+        usrnum = 0
+        usrtxt = ""
 
-@client.on(events.NewMessage(pattern="^/cancel$"))
-async def cancel_spam(event):
-  if not event.chat_id in spam_chats:
-    return await event.respond('__There is no proccess on going...__')
+
+#الغاء التاك
+
+@xavierbot.on(events.NewMessage(pattern="^/cancel$|الغاء|/cancel|ايقاف"))
+async def cancel_mentionall(event):
+  if not event.chat_id in moment_worker:
+    return await event.respond('**__لا يوجد عمليه تاك الان 🤓💕.__**')
   else:
     try:
-      spam_chats.remove(event.chat_id)
+      moment_worker.remove(event.chat_id)
     except:
       pass
-    return await event.respond('__Stopped.__')
+    return await event.respond('**__تم ايقاف التاك 🤓💕__**\n\n**__Powered By:__ @K_P_S_6**')
 
-print(">> BOT STARTED <<")
-client.run_until_disconnected()
+
+
+
+print("تم تنصيب بوت التاك بنجاح 💕🍂")
+print("لو محتاج مساعده @K_P_S_6")
+xavierbot.run_until_disconnected()
